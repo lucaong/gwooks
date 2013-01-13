@@ -57,9 +57,10 @@ Alternatively, you can use the sinatra application provided by the class `Gwooks
 
 ```ruby
 # In your config.ru
+require "gwooks"
 
 Gwooks::App.use_webhook MyHooks
-use Gwooks::App
+run Gwooks::App
 ```
 
 ### Matcher methods
