@@ -18,20 +18,20 @@ Or install it yourself as:
 
 ## Usage
 
-Extend the `Gwooks::Base` class and use the dsl to create you hooks:
+First extend the `Gwooks::Base` class and use the DSL to create your hooks:
 
 ```ruby
 class MyHooks < Gwooks::Base
   
   repository_name "gwooks" do
-    # this block gets called when a post-receive webhook
-    # notifies a push to a repo named "gwooks"
+    # this block gets called when GitHub notifies with a
+    # post-receive hook a push to a repo named "gwooks"
   end
 
   commits_message /Bump new version v(\d+\.\d+\.\d+)/ do |matches|
-    # this block gets called when a post-receive webhook
-    # notifies a push with at least one commit message
-    # matching the Regexp. The block gets passed an array of
+    # this block gets called when GitHub receives
+    # a push with at least one commit message matching
+    # the Regexp. The block gets passed an array of
     # MatchData objects, one for every match.
     matches.each do |match|
       # assuming a publish_tweet method was defined somewhere
@@ -62,6 +62,8 @@ require "gwooks"
 Gwooks::App.use_webhook MyHooks
 run Gwooks::App
 ```
+
+Finally [set up your GitHub repo](https://help.github.com/articles/post-receive-hooks) to trigger a post-receive hook pointing to your endpoint.
 
 ### Matcher methods
 
