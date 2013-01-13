@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = Gwooks::VERSION
   gem.authors       = ["Luca Ongaro"]
   gem.email         = ["lukeongaro@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = "A DSL for quickly creating endpoints for GitHub post-receive webhooks."
+  gem.summary       = "A DSL for quickly creating endpoints for GitHub post-receive webhooks. It provides methods for executing blocks of code when GitHub posts a payload matching some conditions in response to a code push."
+  gem.homepage      = "https://github.com/lucaong/gwooks"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
