@@ -1,6 +1,7 @@
 # Gwooks
 
 A DSL for quickly creating endpoints for [GitHub post-receive webhooks](https://help.github.com/articles/post-receive-hooks).
+This make it possible to perform some actions whenever one of your GitHub repos receives a push matching some custom conditions.
 
 ## Installation
 
@@ -18,14 +19,16 @@ Or install it yourself as:
 
 ## Usage
 
-First extend the `Gwooks::Base` class and use the DSL to create your hooks:
+First extend the `Gwooks::Base` class and use the DSL to create actions to be performed in response to a push:
 
 ```ruby
-class MyHooks < Gwooks::Base
+class MyHookHandler < Gwooks::Base
   
-  repository_name "gwooks" do
-    # this block gets called when GitHub notifies with a
-    # post-receive hook a push to a repo named "gwooks"
+  repository_name "my_cool_project" do
+    # this block gets called when GitHub receives
+    # a push to a repo named "gwooks"
+    contributors = payload["commits"].map { |c| c["author"]["name"] }
+    send_email "someone@email.com", "my_cool_project received changes by: #{ contributors.join(', ') }"
   end
 
   commits_message /Bump new version v(\d+\.\d+\.\d+)/ do |matches|
@@ -34,22 +37,26 @@ class MyHooks < Gwooks::Base
     # the Regexp. The block gets passed an array of
     # MatchData objects, one for every match.
     matches.each do |match|
-      # assuming a publish_tweet method was defined somewhere
-      # we can tweet about the new version released:
-      publish_tweet("New version released: #{match[1]}")
+      send_email("someone@email.com", "New version released: #{match[1]}")
     end
+  end
+  
+  private
+  
+  def send_email(to, msg)
+    # assume we define here a method to send an email
   end
 
 end
 ```
 
-Then set up an application providing an endpoint for the post-receive webhooks and make use of the class you created:
+Then set up an application providing an endpoint for the GitHub post-receive webhook and make use of the class you created:
 
 ```ruby
 require "sinatra"
 
 post "/webhook" do
-  MyHooks.call(params[:payload])
+  MyHookHandler.call(params[:payload])
 end
 ```
 
@@ -59,15 +66,19 @@ Alternatively, you can use the sinatra application provided by the class `Gwooks
 # In your config.ru
 require "gwooks"
 
-Gwooks::App.use_webhook MyHooks
+# Tell Gwooks::App to use your class
+Gwooks::App.use_webhook MyHookHandler
+
+# Gwooks::App sets up an endpoint on POST /"
 run Gwooks::App
 ```
 
 Finally [set up your GitHub repo](https://help.github.com/articles/post-receive-hooks) to trigger a post-receive hook pointing to your endpoint.
+Whenever GitHub receives a push, your endpoint will be notified, and _all_ the matching actions will be performed.
 
-### Matcher methods
+### DSL methods
 
-The full list of matcher methods is the following:
+The full list of the DSL methods is the following (each of them match a corresponding object in the payload sent by the GitHub post-receive hook):
 ```
 after
 before
