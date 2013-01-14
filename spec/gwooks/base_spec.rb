@@ -61,6 +61,17 @@ describe "subclass of Gwooks::Base" do
       end
     end
   end
+
+  method_names.select { |n| n.start_with? "commits_" }.each do |method_name|
+    aliased_method_name = method_name.gsub(/^commits_/, "commit_")
+
+    describe aliased_method_name do
+      it "is an alias for #{method_name}" do
+        aliased_method = GwooksBaseSub.method(aliased_method_name.to_sym)
+        aliased_method.should == GwooksBaseSub.method(method_name.to_sym)
+      end
+    end
+  end
  
   describe "instance" do
 

@@ -54,6 +54,10 @@ module Gwooks
         end
       end
 
+      method_names.select { |n| n.start_with? "commits_" }.each do |method_name|
+        alias_method method_name.gsub(/^commits_/, "commit_"), method_name
+      end
+
     end
 
     attr_reader :payload
