@@ -1,7 +1,7 @@
 # Gwooks
 
 A DSL for quickly creating endpoints for [GitHub post-receive webhooks](https://help.github.com/articles/post-receive-hooks).
-This make it possible to perform some actions whenever one of your GitHub repos receives a push matching some custom conditions.
+It makes it easy to perform some actions whenever one of your GitHub repos receives a push matching some custom conditions.
 
 ## Installation
 
@@ -103,3 +103,7 @@ repository_private
 repository_url
 repository_watchers
 ```
+
+## Beta
+
+Please take into consideration that this is a beta release, and as such the API may change
