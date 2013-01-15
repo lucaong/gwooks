@@ -54,8 +54,19 @@ module Gwooks
         end
       end
 
-      method_names.select { |n| n.start_with? "commits_" }.each do |method_name|
-        alias_method method_name.gsub(/^commits_/, "commit_"), method_name
+      to_be_aliased = method_names.select do |n|
+        n.start_with? "commits_", "repository_"
+      end
+
+      to_be_aliased.each do |method_name|
+        alias_name = method_name.gsub /^(commits|repository)_/ do
+          if $1 == "commits"
+            "commit_"
+          else
+            "repo_"
+          end
+        end
+        alias_method alias_name, method_name
       end
 
     end
