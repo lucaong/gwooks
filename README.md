@@ -83,8 +83,10 @@ notified, and _all_ the matching actions will be performed.
 ### DSL methods
 
 Each DSL method matches a corresponding property in the payload sent by the GitHub post-receive hooks
-(e.g. `repository_owner_email` matches `payload["repository"]["owner"]["email"]`). Note that all the methods
-starting with `commits` are also aliased with the singular `commit` to improve code readability.
+(e.g. `repository_owner_email` matches `payload["repository"]["owner"]["email"]`).
+
+Note that all the methods starting with `commits` are also aliased with the singular `commit`, and
+those starting with `repository` are aliased with `repo` to improve code readability.
 
 The signature is identical for all methods:
 
@@ -113,18 +115,28 @@ commits_removed      (alias: commit_removed)
 commits_timestamp    (alias: commit_timestamp)
 commits_url          (alias: commit_url)
 ref
-repository_description
-repository_forks
-repository_homepage
-repository_name
-repository_owner_email
-repository_owner_name
-repository_pledgie
-repository_private
-repository_url
-repository_watchers
+repository_description (alias: repo_description)
+repository_forks       (alias: repo_forks)
+repository_homepage    (alias: repo_homepage)
+repository_name        (alias: repo_name)
+repository_owner_email (alias: repo_owner_email)
+repository_owner_name  (alias: repo_owner_name)
+repository_pledgie     (alias: repo_pledgie)
+repository_private     (alias: repo_private)
+repository_url         (alias: repo_url)
+repository_watchers    (alias: repo_watchers)
 ```
+
 
 ## Beta
 
 Please take into consideration that this is a beta release, and as such the API may change
+
+
+## Changelog
+
+v0.0.3 - Alias `repository_` methods to `repo_`
+
+v0.0.2 - Alias `commits_` methods to `commit_`
+
+v0.0.1 - First release
