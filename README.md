@@ -24,7 +24,7 @@ Or install it yourself as:
 First extend the `Gwooks::Base` class and use the DSL to create actions to be performed in response to a push:
 
 ```ruby
-class MyHookHandler < Gwooks::Base
+class MyActions < Gwooks::Base
   
   repository_name "my_cool_project" do
     # this block gets executed when GitHub receives
@@ -59,7 +59,7 @@ class you created:
 require "sinatra"
 
 post "/webhook" do
-  MyHookHandler.call(params[:payload])
+  MyActions.call(params[:payload])
 end
 ```
 
@@ -70,7 +70,7 @@ Alternatively, you can use the sinatra application provided by the class `Gwooks
 require "gwooks"
 
 # Tell Gwooks::App to use your class
-Gwooks::App.use_webhook MyHookHandler
+Gwooks::App.use_webhook MyActions
 
 # Gwooks::App sets up an endpoint on POST /"
 run Gwooks::App
