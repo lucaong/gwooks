@@ -8,6 +8,13 @@ describe "subclass of Gwooks::Base" do
     GwooksBaseSub = Class.new(Gwooks::Base)
   end
 
+  describe :new do
+    it "creates and store a new instance of Gwooks::Payload" do
+      gwooks = GwooksBaseSub.new({"foo" => "bar"})
+      gwooks.payload.should == {"foo" => "bar"}
+    end
+  end
+
   describe :call do
     it "creates a new instance passing payload and then invokes call()" do
       gwooks = double GwooksBaseSub.new("{}")
@@ -83,19 +90,7 @@ describe "subclass of Gwooks::Base" do
     end
   end
 
-  describe "instance" do
-
-    describe :new do
-      it "initializes payload parsing the argument as JSON if it is a string" do
-        gwooks = GwooksBaseSub.new("{\"foo\": \"bar\"}")
-        gwooks.send(:payload).should == {"foo" => "bar"}
-      end
-
-      it "initializes payload using the argument if it is not a string" do
-        gwooks = GwooksBaseSub.new({"foo" => "bar"})
-        gwooks.send(:payload).should == {"foo" => "bar"}
-      end
-    end
+  describe "instance" do 
 
     describe :call do
       it "executes all matching hooks" do
@@ -211,64 +206,6 @@ describe "subclass of Gwooks::Base" do
         probe.should include("foo", "fooey")
       end
     end 
-
-    describe :resolve_key do
-      it "returns nested object according to the key" do
-        GwooksBaseSub.new(
-          "foo" => {
-            "bar" => {
-              "baz" => "qux"
-            }
-          }
-        ).send(:resolve_key, "foo.bar.baz").should == "qux"
-      end
-      
-      it "returns nil if nested object does not exist" do
-        GwooksBaseSub.new(
-          "foo" => {
-            "bar" => {}
-          }
-        ).send(:resolve_key, "foo.bar.baz").should == nil
-      end
-
-      it "returns nil if parent object does not exist" do
-        GwooksBaseSub.new(
-          "foo" => {}
-        ).send(:resolve_key, "foo.bar.baz").should == nil
-      end
-
-      it "returns all items in array when item is an array" do
-        GwooksBaseSub.new(
-          "foo" => ["a", "b", "c"]
-        ).send(:resolve_key, "foo").should == ["a", "b", "c"]
-      end
-
-      it "resolve key in array" do
-        GwooksBaseSub.new(
-          "foo" => [
-            { "bar" => 123 },
-            { "bar" => 321 }
-          ]
-        ).send(:resolve_key, "foo.bar").should == [123, 321]
-      end
-
-      it "resolve key in nested arrays" do
-        GwooksBaseSub.new(
-          "foo" => [
-            { "bar" => [
-              {"baz" => 123},
-              {"baz" => 321}
-            ]},
-            { "bar" => [
-              {"baz" => 312},
-              {"baz" => 132}
-            ]}
-          ]
-        ).send(:resolve_key, "foo.bar.baz").should == [123, 321, 312, 132]
-      end
-
-
-    end
 
   end
 

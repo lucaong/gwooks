@@ -1,4 +1,4 @@
-require "json"
+require File.expand_path("payload.rb", File.dirname(__FILE__))
 
 module Gwooks
   class Base
@@ -72,20 +72,15 @@ module Gwooks
     end
 
     attr_reader :payload
-    private :payload
 
     def initialize(payload)
-      if payload.is_a? String
-        @payload = JSON.parse(payload)
-      else
-        @payload = payload
-      end
+      @payload = Gwooks::Payload.new(payload) 
     end
 
     def call
       self.class.hooks.each do |hook|
         key, pattern, block = *hook
-        target = resolve_key(key)
+        target = payload.resolve(key)
         if target.is_a? Array 
           match = target.map do |t|
             match_pattern(t, pattern)
@@ -100,20 +95,7 @@ module Gwooks
       nil
     end
 
-    private
-
-    def resolve_key(key)
-      key.split(".").inject(payload) do |obj, segment|
-        break nil if obj.nil?
-        if obj.is_a? Array
-          obj.map do |item|
-            item[segment] 
-          end.flatten
-        else
-          obj[segment]
-        end
-      end
-    end
+    private 
 
     def match_pattern(target, pattern)
       if pattern.is_a? Regexp
