@@ -31,7 +31,7 @@ class MyActions < Gwooks::Base
     # a push to a repo named "my_cool_project"
 
     # Here you can also access the payload sent by GitHub, parsed to a hash:
-    contributors = payload[:commits].map {|c| c[:author][:name] }
+    contributors = payload[:commits].map {|c| c[:author][:name] }.uniq
     send_email "someone@email.com", "my_cool_project received changes by: #{ contributors.join(', ') }"
   end
 
