@@ -35,6 +35,7 @@ describe "subclass of Gwooks::Base" do
   method_names = %w(
     after
     before
+    branch
     commits_added
     commits_author_email
     commits_author_name

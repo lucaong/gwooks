@@ -13,6 +13,11 @@ describe Gwooks::Payload do
         payload = Gwooks::Payload.new({"foo" => "bar"})
         payload.should == {"foo" => "bar"}
       end
+
+      it "creates the additional 'branch' property from ref" do
+        payload = Gwooks::Payload.new({"ref" => "refs/heads/foo"})
+        payload.should == {"ref" => "refs/heads/foo", "branch" => "foo"}
+      end
     end
   end
 

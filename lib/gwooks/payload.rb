@@ -11,7 +11,16 @@ module Gwooks
           hash[key.to_s] if key.is_a? Symbol
         end
         payload = JSON.parse(payload) if payload.is_a? String
+        set_branch payload
         new_hash.update(payload)
+      end
+
+      private
+
+      def set_branch(payload)
+        if payload["ref"] and payload["ref"].start_with? "refs/heads/"
+          payload["branch"] = payload["ref"].gsub(/^refs\/heads\//, "")
+        end
       end
     end
 
@@ -51,7 +60,7 @@ module Gwooks
       else
         obj
       end
-    end
+    end 
 
   end
 end
