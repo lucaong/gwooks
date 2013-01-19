@@ -1,9 +1,9 @@
 # Gwooks
 
-A DSL for quickly creating endpoints for
-[GitHub post-receive webhooks](https://help.github.com/articles/post-receive-hooks).
-It makes it easy to perform some actions whenever one of your GitHub repos receives a push matching someone
-custom conditions.
+A DSL for quickly creating endpoints for [GitHub post-receive
+webhooks](https://help.github.com/articles/post-receive-hooks).  It makes it
+easy to perform some actions whenever one of your GitHub repos receives a push
+matching someone custom conditions.
 
 ## Installation
 
@@ -21,7 +21,8 @@ Or install it yourself as:
 
 ## Usage
 
-First extend the `Gwooks::Base` class and use the DSL to create actions to be performed in response to a push:
+First extend the `Gwooks::Base` class and use the DSL to create actions to be
+performed in response to a push:
 
 ```ruby
 class MyActions < Gwooks::Base
@@ -52,8 +53,8 @@ class MyActions < Gwooks::Base
 end
 ```
 
-Then set up an application providing an endpoint for the GitHub post-receive webhook and make use of the
-class you created:
+Then set up an application providing an endpoint for the GitHub post-receive
+webhook and make use of the class you created:
 
 ```ruby
 require "sinatra"
@@ -63,7 +64,8 @@ post "/webhook" do
 end
 ```
 
-Alternatively, you can use the sinatra application provided by the class `Gwooks::App`:
+Alternatively, you can use the sinatra application provided by the class
+`Gwooks::App`:
 
 ```ruby
 # In your config.ru
@@ -76,32 +78,41 @@ Gwooks::App.use_webhook MyActions
 run Gwooks::App
 ```
 
-Finally [set up your GitHub repo](https://help.github.com/articles/post-receive-hooks) to trigger a
-post-receive hook pointing to your endpoint. Whenever GitHub receives a push, your endpoint will be
-notified, and _all_ the matching actions will be performed.
+Finally [set up your GitHub
+repo](https://help.github.com/articles/post-receive-hooks) to trigger a
+post-receive hook pointing to your endpoint. Whenever GitHub receives a push,
+your endpoint will be notified, and _all_ the matching actions will be
+performed.
 
-### DSL methods
+### Class methods (DSL)
 
-Each DSL method matches a corresponding property in the payload sent by the GitHub post-receive hooks
-(e.g. `repository_owner_email` matches `payload["repository"]["owner"]["email"]`).
+Each of the DSL methods matches a corresponding property in the payload object
+(e.g. `repository_owner_email` matches
+`payload["repository"]["owner"]["email"]`). The payload is the one sent by the
+GitHub post-receive hooks, parsed into a hash and with an additional `branch`
+property.
 
-Note that all the methods starting with `commits` are also aliased with the singular `commit`, and
-those starting with `repository` are aliased with `repo` to improve code readability.
+Note that all the methods starting with `commits` are also aliased with the
+singular `commit`, and those starting with `repository` are aliased with
+`repo` to improve code readability.
 
 The signature is identical for all methods:
 
 ```ruby
-dsl_method_name(pattern, &block)
+repository_owner_email(pattern, &block)
 ```
 
-**pattern** can be any object. If it is a Regexp, it is matched against
-the target property in the payload, otherwise it is checked for equality.
+**pattern** can be any object. If it is a Regexp, it is matched against the
+target property in the payload, otherwise it is checked for equality.
 
-**block** is called passing the match, or array of matches if the target
-property is an array (which is, in all commit* methods). The match is a
-MatchData object when regexp matching is used, or the matched pattern otherwise.
+**block** is called once if there is at least one match, and it gets passed
+the match, or an array of matches if the target property is an array (all
+`commits` methods match against the array of commits and their properties). The
+match is a MatchData object when regexp matching is used, or the matched
+pattern otherwise. The block is evaluated in the instance scope, and thus can
+access the `payload` object.
 
-Here is the full list of the DSL methods: 
+Here is the full list of DSL methods: 
 ```
 after
 before
@@ -128,9 +139,35 @@ repository_watchers    (alias: repo_watchers)
 ```
 
 
-## Beta
+## Payload
 
-Please take into consideration that this is a beta release, and as such the API may change
+The payload sent by GitHub is parsed into a hash-like object and is available
+through the `payload` instance method. For convenience, a `branch` property is
+added to it, indicating the branch that received the push (extrapolated from
+the `ref`). The payload property can be indifferently accessed using symbol or
+string keys.
+
+The `payload` object also has a `resolve` method that takes a string key and
+returns the matched property (or array of matched properties) or `nil` if the
+property or one of its parents is not set:
+
+```ruby
+payload.resolve "repository.owner.name"
+# returns the repo owner name, or nil if either payload["repository"],
+# payload["repository"]["owner"] or payload["repository"]["owner"]["name"] are
+# not set.
+
+payload.resolve "commits.author.name"
+# returns the array of each commit's author name
+# Equivalent to `payload["commits"].map {|c| c["author"]["name"]}`, but it
+# does not raise errors if some property is not set.
+```
+
+
+## Alpha release
+
+Please take into consideration that this is an alpha release, and as such the API
+may change frequently.
 
 
 ## Changelog
