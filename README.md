@@ -172,7 +172,9 @@ may change frequently.
 
 ## Changelog
 
-v0.0.4 - Add `branch` payload property and corresponding DSL method
+v0.0.5 - Add `branch` payload property and corresponding DSL method
+
+v0.0.4 - Payload with indifferent access
 
 v0.0.3 - Alias `repository_` methods to `repo_`
 
