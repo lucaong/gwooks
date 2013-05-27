@@ -180,6 +180,8 @@ may change frequently.
 
 ## Changelog
 
+v0.0.6 - Add possibility to nest matcher methods
+
 v0.0.5 - Add `branch` payload property and corresponding DSL method
 
 v0.0.4 - Payload with indifferent access
