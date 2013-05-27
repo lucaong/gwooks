@@ -26,12 +26,12 @@ First extend the `Gwooks::Base` class and use the DSL to create actions to be pe
 ```ruby
 class MyActions < Gwooks::Base
 
+  # Do something when GitHub receives a push to a repository
+  # named "my_cool_project":
   repository_name "my_cool_project" do
-    # this block gets executed when GitHub receives
-    # a push to a repo named "my_cool_project"
 
-    # You can nest matchers. The nesx blockck for example is executed when
-    # GitHub receives a push to the master branch
+    # You can nest matchers. The following block for example is executed
+    # when GitHub receives a push to the 'master' branch:
     branch "master" do
       # You have also access to the payload sent by GitHub, parsed to a hash:
       contributors = payload[:commits].map {|c| c[:author][:email] }
@@ -40,14 +40,15 @@ class MyActions < Gwooks::Base
       end
     end
 
-    # you can match with regular exceptions too. E.g. the next block gets
+    # You can match with regular exceptions too. E.g. the next block gets
     # called when GitHub receives a push with at least one commit message
-    # matching the given Regexp.
+    # matching the given Regexp:
     commit_message /Bump new version v(\d+\.\d+\.\d+)/ do |matches|
       matches.each do |match|
         send_email("someone@email.com", "New version released: #{match[1]}")
       end
     end
+
   end
 
   private
