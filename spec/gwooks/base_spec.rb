@@ -3,6 +3,32 @@ require File.expand_path("../../lib/gwooks/base.rb", File.dirname(__FILE__))
 
 describe "subclass of Gwooks::Base" do
 
+  dsl_methods = %w(
+    after
+    before
+    branch
+    commits_added
+    commits_author_email
+    commits_author_name
+    commits_id
+    commits_message
+    commits_modified
+    commits_removed
+    commits_timestamp
+    commits_url
+    ref
+    repository_description
+    repository_forks
+    repository_homepage
+    repository_name
+    repository_owner_email
+    repository_owner_name
+    repository_pledgie
+    repository_private
+    repository_url
+    repository_watchers
+  )
+
   before(:each) do
     Object.send(:remove_const, "GwooksBaseSub") if Object.const_defined?("GwooksBaseSub")
     GwooksBaseSub = Class.new(Gwooks::Base)
@@ -32,33 +58,7 @@ describe "subclass of Gwooks::Base" do
     end
   end
 
-  method_names = %w(
-    after
-    before
-    branch
-    commits_added
-    commits_author_email
-    commits_author_name
-    commits_id
-    commits_message
-    commits_modified
-    commits_removed
-    commits_timestamp
-    commits_url
-    ref
-    repository_description
-    repository_forks
-    repository_homepage
-    repository_name
-    repository_owner_email
-    repository_owner_name
-    repository_pledgie
-    repository_private
-    repository_url
-    repository_watchers
-  )
-  
-  method_names.each do |method_name|
+  dsl_methods.each do |method_name|
     key = method_name.gsub("_", ".")
 
     describe method_name do
@@ -70,7 +70,7 @@ describe "subclass of Gwooks::Base" do
     end
   end
 
-  to_be_aliased = method_names.select do |n|
+  to_be_aliased = dsl_methods.select do |n|
     n.start_with? "commits_", "repository_"
   end
 
@@ -207,6 +207,36 @@ describe "subclass of Gwooks::Base" do
         probe.should include("foo", "fooey")
       end
     end 
+
+    dsl_methods.each do |method_name|
+      key = method_name.gsub("_", ".")
+
+      describe method_name do
+        it "executes block if '#{key}' matches value" do
+          called = false
+          gwooks = GwooksBaseSub.new(
+            "repository" => {
+              "url" => "foo/bar"
+            }
+          )
+          gwooks.payload.should_receive(:resolve).with(key).and_return "foo"
+          gwooks.send method_name.to_sym, "foo", &(Proc.new { called = true })
+          called.should be_true
+        end
+
+        it "does not executes block if '#{key}' does not match value" do
+          called = false
+          gwooks = GwooksBaseSub.new(
+            "repository" => {
+              "url" => "foo/bar"
+            }
+          )
+          gwooks.payload.should_receive(:resolve).with(key).and_return "bar"
+          gwooks.send method_name.to_sym, "foo", &(Proc.new { called = true })
+          called.should be_false
+        end
+      end
+    end
 
   end
 
