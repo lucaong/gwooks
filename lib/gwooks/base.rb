@@ -43,10 +43,6 @@ module Gwooks
         @_hooks << [key, pattern, block]
       end
 
-      def ref(pattern, &block)
-        payload_matches("ref", pattern, &block)
-      end
-
       DSL_METHODS.each do |method_name|
         key = method_name.gsub("_", ".")
 
