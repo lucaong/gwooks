@@ -26,26 +26,34 @@ performed in response to a push:
 
 ```ruby
 class MyActions < Gwooks::Base
-  
+
+  # Do something when GitHub receives a push to a repository
+  # named "my_cool_project":
   repository_name "my_cool_project" do
-    # this block gets executed when GitHub receives
-    # a push to a repo named "my_cool_project"
 
-    # Here you can also access the payload sent by GitHub, parsed to a hash:
-    contributors = payload[:commits].map {|c| c[:author][:name] }.uniq
-    send_email "someone@email.com", "my_cool_project received changes by: #{ contributors.join(', ') }"
-  end
-
-  commit_message /Bump new version v(\d+\.\d+\.\d+)/ do |matches|
-    # this block gets called when GitHub receives a push
-    # with at least one commit message matching the Regexp.
-    matches.each do |match|
-      send_email("someone@email.com", "New version released: #{match[1]}")
+    # You can nest matchers. The following block for example is executed
+    # when GitHub receives a push to the 'master' branch:
+    branch "master" do
+      # You have also access to the payload sent by GitHub, parsed to a hash:
+      contributors = payload[:commits].map {|c| c[:author][:email] }
+      contributors.uniq.each do |email|
+        send_email email, "Thanks for your contribution :)"
+      end
     end
+
+    # You can match with regular exceptions too. E.g. the next block gets
+    # called when GitHub receives a push with at least one commit message
+    # matching the given Regexp:
+    commit_message /Bump new version v(\d+\.\d+\.\d+)/ do |matches|
+      matches.each do |match|
+        send_email("someone@email.com", "New version released: #{match[1]}")
+      end
+    end
+
   end
-  
+
   private
-  
+
   def send_email(to, msg)
     # assume we define here a method to send an email
   end
@@ -112,7 +120,7 @@ match is a MatchData object when regexp matching is used, or the matched
 pattern otherwise. The block is evaluated in the instance scope, and thus can
 access the `payload` object.
 
-Here is the full list of DSL methods: 
+Here is the full list of DSL methods:
 ```
 after
 before
