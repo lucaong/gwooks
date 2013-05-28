@@ -22,7 +22,7 @@ Or install it yourself as:
 ## Usage
 
 First extend the `Gwooks::Base` class and use the DSL to create actions to be
-performed in response to a push:
+performed in response to a code push:
 
 ```ruby
 class MyActions < Gwooks::Base
@@ -32,7 +32,7 @@ class MyActions < Gwooks::Base
   repository_name "my_cool_project" do
 
     # You can nest matchers. The following block for example is executed
-    # when GitHub receives a push to the 'master' branch:
+    # when GitHub receives a push to 'my_cool_project' repo's 'master' branch:
     branch "master" do
       # You have also access to the payload sent by GitHub, parsed to a hash:
       contributors = payload[:commits].map {|c| c[:author][:email] }
