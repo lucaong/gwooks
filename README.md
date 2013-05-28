@@ -124,6 +124,7 @@ Here is the full list of DSL methods:
 ```
 after
 before
+branch
 commits_added        (alias: commit_added)
 commits_author_email (alias: commit_author_email)
 commits_author_name  (alias: commit_author_name)
@@ -145,6 +146,10 @@ repository_private     (alias: repo_private)
 repository_url         (alias: repo_url)
 repository_watchers    (alias: repo_watchers)
 ```
+
+Each of them matches a corresponding field in the payload sent by GitHub,
+except `branch`, which is a shortcut to match the branch using info in the
+`ref` (e.g. `branch "master"` is a shortcut for `ref "refs/heads/master"`)
 
 
 ## Payload
