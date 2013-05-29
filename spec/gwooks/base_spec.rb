@@ -91,7 +91,7 @@ describe "subclass of Gwooks::Base" do
     end
   end
 
-  describe "instance" do 
+  describe "instance" do
 
     describe :call do
       it "executes all matching hooks" do
@@ -206,7 +206,7 @@ describe "subclass of Gwooks::Base" do
         ).call()
         probe.should include("foo", "fooey")
       end
-    end 
+    end
 
     dsl_methods.each do |method_name|
       key = method_name.gsub("_", ".")
@@ -236,6 +236,60 @@ describe "subclass of Gwooks::Base" do
           called.should be_false
         end
       end
+    end
+
+    describe "when nesting callbacks" do
+
+      before(:each) do
+        class GwooksBaseSub
+          attr_accessor :probe
+
+          def initialize( payload )
+            @probe = []
+            super payload
+          end
+
+          repository_name "foo" do
+            @probe << 0
+
+            branch "bar" do
+              @probe << 1
+
+              repository_owner_name /Bob/ do
+                @probe << 2
+              end
+            end
+
+            branch "baz" do
+              @probe << 3
+            end
+          end
+
+          repository_url "qux/quux" do
+            @probe << 4
+          end
+        end
+
+        @gwooks = GwooksBaseSub.new(
+          "repository" => {
+            "name" => "foo",
+            "owner" => {
+              "name" => "Bob Jones"
+            },
+          },
+          "ref" => "refs/heads/bar"
+        )
+        @gwooks.call
+      end
+
+      it "executes all the applicable blocks" do
+        @gwooks.probe.should include( 1, 2 )
+      end
+
+      it "does not execute non-matching blocks" do
+        @gwooks.probe.should_not include( 3, 4 )
+      end
+
     end
 
   end
