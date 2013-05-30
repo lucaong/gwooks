@@ -2,8 +2,8 @@
 
 A DSL for quickly creating endpoints for [GitHub post-receive
 webhooks](https://help.github.com/articles/post-receive-hooks).  It makes it
-easy to perform some actions whenever one of your GitHub repos receives a push
-matching someone custom conditions.
+easy to trigger an action whenever one of your GitHub repos receives a push
+matching some custom conditions.
 
 ## Installation
 
@@ -21,7 +21,7 @@ Or install it yourself as:
 
 ## Usage
 
-First extend the `Gwooks::Base` class and use the DSL to create actions to be
+First extend the `Gwooks::Base` class and use its DSL to create actions to be
 performed in response to a code push:
 
 ```ruby
@@ -61,8 +61,8 @@ class MyActions < Gwooks::Base
 end
 ```
 
-Then set up an application providing an endpoint for the GitHub post-receive
-webhook and make use of the class you created:
+Then provide an endpoint for the GitHub post-receive webhook making use
+of the class you created:
 
 ```ruby
 require "sinatra"
@@ -72,8 +72,8 @@ post "/webhook" do
 end
 ```
 
-Alternatively, you can use the sinatra application provided by the class
-`Gwooks::App`:
+Alternatively, you can use the Sinatra application provided by the class
+`Gwooks::App`, which is already setup for you:
 
 ```ruby
 # In your config.ru
@@ -82,7 +82,7 @@ require "gwooks"
 # Tell Gwooks::App to use your class
 Gwooks::App.use_webhook MyActions
 
-# Gwooks::App sets up an endpoint on POST /"
+# Gwooks::App responds to "POST /"
 run Gwooks::App
 ```
 
@@ -92,19 +92,19 @@ post-receive hook pointing to your endpoint. Whenever GitHub receives a push,
 your endpoint will be notified, and _all_ the matching actions will be
 performed.
 
-### Class methods (DSL)
+### Matcher methods (DSL)
 
-Each of the DSL methods matches a corresponding property in the payload object
-(e.g. `repository_owner_email` matches
-`payload["repository"]["owner"]["email"]`). The payload is the one sent by the
-GitHub post-receive hooks, parsed into a hash and with an additional `branch`
-property.
+Each of the DSL methods matches a corresponding property in the
+[payload](https://help.github.com/articles/post-receive-hooks#the-payload)
+object (e.g. `repository_owner_email` matches
+`payload["repository"]["owner"]["email"]`). The payload is accessible through
+the `payload` method, parsed into a hash.
 
 Note that all the methods starting with `commits` are also aliased with the
 singular `commit`, and those starting with `repository` are aliased with
 `repo` to improve code readability.
 
-The signature is identical for all methods:
+The signature is identical for all matcher methods:
 
 ```ruby
 repository_owner_email(pattern, &block)
